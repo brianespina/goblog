@@ -15,6 +15,9 @@ type Post struct {
 	Slug string
 	Body template.HTML
 }
+type Posts struct {
+	Slugs []string
+}
 
 var templatePath = "templates/"
 var blogPath = "blog/"
@@ -39,13 +42,32 @@ func loadPost(slug string) (*Post, error) {
 	mdToHtml(&body)
 	return &Post{Slug: "title", Body: template.HTML(body)}, nil
 }
+
+func loadPosts(dir string) (*Posts, error) {
+	posts, _ := os.ReadDir(dir)
+	var names []string
+	for _, post := range posts {
+		names = append(names, post.Name())
+	}
+	return &Posts{Slugs: names}, nil
+}
+
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-	posts, err := os.ReadDir("blog")
+	posts, err := loadPosts("blog")
 	if err != nil {
-		log.Fatal(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	t, _ := template.ParseFiles(templatePath+"layout.html", templatePath+"home.html")
+	t, err := template.ParseFiles(templatePath+"layout.html", templatePath+"home.html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	err = t.Execute(w, posts)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 func viewHandler(w http.ResponseWriter, r *http.Request) {
 	post, err := loadPost("my-first-post")

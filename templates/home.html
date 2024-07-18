@@ -1,0 +1,8 @@
+{{define "head"}}<title>Blog Roll</title>{{end}}
+{{ define "body" }}
+<div>
+	{{ range .Slugs }}
+	<a href="/{{ . }}">{{ . }}</a>
+	{{ end}}
+</div>
+{{end}}
