@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/gomarkdown/markdown"
 	"github.com/gomarkdown/markdown/html"
@@ -47,7 +49,9 @@ func loadPosts(dir string) (*Posts, error) {
 	posts, _ := os.ReadDir(dir)
 	var names []string
 	for _, post := range posts {
-		names = append(names, post.Name())
+		name := post.Name()
+		slug := strings.TrimSuffix(name, filepath.Ext(name))
+		names = append(names, slug)
 	}
 	return &Posts{Slugs: names}, nil
 }
