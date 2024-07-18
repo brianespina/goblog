@@ -39,7 +39,14 @@ func loadPost(slug string) (*Post, error) {
 	mdToHtml(&body)
 	return &Post{Slug: "title", Body: template.HTML(body)}, nil
 }
-
+func homeHandler(w http.ResponseWriter, r *http.Request) {
+	posts, err := os.ReadDir("blog")
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	t, _ := template.ParseFiles(templatePath+"layout.html", templatePath+"home.html")
+}
 func viewHandler(w http.ResponseWriter, r *http.Request) {
 	post, err := loadPost("my-first-post")
 	if err != nil {
@@ -59,6 +66,7 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	http.HandleFunc("/", homeHandler)
 	http.HandleFunc("/blog/", viewHandler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
