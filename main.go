@@ -59,17 +59,17 @@ func loadPosts(dir string) (*Posts, error) {
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	posts, err := loadPosts("blog")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		throwInternalServerError(w, err)
 		return
 	}
 	t, err := template.ParseFiles(templatePath+"layout.html", templatePath+"home.html")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		throwInternalServerError(w, err)
 		return
 	}
 	err = t.Execute(w, posts)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		throwInternalServerError(w, err)
 		return
 	}
 }
@@ -77,7 +77,7 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	post, err := loadPost(vars["slug"])
 	if err != nil {
-		log.Fatal(err)
+		http.NotFound(w, r)
 		return
 	}
 	t, err := template.ParseFiles(templatePath+"layout.html", templatePath+"page.html")
@@ -87,12 +87,15 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	err = t.Execute(w, post)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		throwInternalServerError(w, err)
 		return
 	}
 }
 func faviconHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "public/images/favicon.ico")
+}
+func throwInternalServerError(w http.ResponseWriter, err error) {
+	http.Error(w, err.Error(), http.StatusInternalServerError)
 }
 func main() {
 	r := mux.NewRouter()
