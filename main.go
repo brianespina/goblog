@@ -5,12 +5,12 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/gomarkdown/markdown"
 	"github.com/gomarkdown/markdown/html"
 	"github.com/gomarkdown/markdown/parser"
+	"github.com/gorilla/mux"
 )
 
 type Post struct {
@@ -50,7 +50,7 @@ func loadPosts(dir string) (*Posts, error) {
 	var names []string
 	for _, post := range posts {
 		name := post.Name()
-		slug := strings.TrimSuffix(name, filepath.Ext(name))
+		slug, _, _ := strings.Cut(name, ".")
 		names = append(names, slug)
 	}
 	return &Posts{Slugs: names}, nil
@@ -92,7 +92,8 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/", homeHandler)
-	http.HandleFunc("/blog/", viewHandler)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	r := mux.NewRouter()
+	r.HandleFunc("/", homeHandler)
+	r.HandleFunc("/blog/", viewHandler)
+	http.ListenAndServe(":8080", r)
 }
