@@ -74,7 +74,8 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func viewHandler(w http.ResponseWriter, r *http.Request) {
-	post, err := loadPost("my-first-post")
+	vars := mux.Vars(r)
+	post, err := loadPost(vars["slug"])
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -90,10 +91,13 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
-
+func faviconHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "public/images/favicon.ico")
+}
 func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", homeHandler)
-	r.HandleFunc("/blog/", viewHandler)
+	r.HandleFunc("/favicon.ico", faviconHandler)
+	r.HandleFunc("/{slug}", viewHandler)
 	http.ListenAndServe(":8080", r)
 }
