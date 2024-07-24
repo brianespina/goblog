@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/adrg/frontmatter"
 	"github.com/gomarkdown/markdown"
 	"github.com/gomarkdown/markdown/html"
 	"github.com/gomarkdown/markdown/parser"
@@ -16,33 +17,47 @@ import (
 type Post struct {
 	Slug string
 	Body template.HTML
+	Meta MetaData
 }
 type Posts struct {
 	Slugs []string
+}
+type MetaData struct {
+	Title string `yaml:"title"`
 }
 
 var templatePath = "templates/"
 var blogPath = "blog/"
 
-func mdToHtml(md *[]byte) {
+func mdToHtml(md []byte) (post *Post) {
+	getMetaData(md, post)
 	extensions := parser.CommonExtensions | parser.AutoHeadingIDs | parser.NoEmptyLineBeforeBlock
 	p := parser.NewWithExtensions(extensions)
-	doc := p.Parse(*md)
+	doc := p.Parse([]byte(post.Body))
 
 	htmlFlags := html.CommonFlags
 	opts := html.RendererOptions{Flags: htmlFlags}
 	renderer := html.NewRenderer(opts)
-	*md = markdown.Render(doc, renderer)
+	post.Body = template.HTML(markdown.Render(doc, renderer))
+	return
 }
-
+func getMetaData(md []byte, post *Post) {
+	meta := &MetaData{}
+	rest, err := frontmatter.Parse(strings.NewReader(string(md)), meta)
+	if err != nil {
+		log.Fatal("Error getting meta data")
+	}
+	post.Meta = *meta
+	post.Body = template.HTML(rest)
+}
 func loadPost(slug string) (*Post, error) {
 	filename := blogPath + slug + ".md"
 	body, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
-	mdToHtml(&body)
-	return &Post{Slug: "title", Body: template.HTML(body)}, nil
+	//	return &Post{Slug: "title", Body: template.HTML(body)}, nil
+	return mdToHtml(body), nil
 }
 
 func loadPosts(dir string) (*Posts, error) {

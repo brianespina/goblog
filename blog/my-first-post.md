@@ -1,4 +1,8 @@
 ---
+title: This is a title of my First Post
+---
+
+---
 __Advertisement :)__
 
 - __[pica](https://nodeca.github.io/pica/demo/)__ - high quality and fast image
