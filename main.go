@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"html/template"
 	"log"
 	"net/http"
@@ -15,9 +16,9 @@ import (
 )
 
 type Post struct {
-	Slug string
-	Body template.HTML
-	Meta MetaData
+	Slug  string
+	Title string
+	Body  template.HTML
 }
 type Posts struct {
 	Slugs []string
@@ -29,26 +30,16 @@ type MetaData struct {
 var templatePath = "templates/"
 var blogPath = "blog/"
 
-func mdToHtml(md []byte) (post *Post) {
-	getMetaData(md, post)
-	extensions := parser.CommonExtensions | parser.AutoHeadingIDs | parser.NoEmptyLineBeforeBlock
+func mdToHtml(post *Post, body []byte) {
+	extensions := parser.CommonExtensions | parser.AutoHeadingIDs
 	p := parser.NewWithExtensions(extensions)
-	doc := p.Parse([]byte(post.Body))
 
-	htmlFlags := html.CommonFlags
+	htmlFlags := html.CommonFlags | html.HrefTargetBlank
 	opts := html.RendererOptions{Flags: htmlFlags}
 	renderer := html.NewRenderer(opts)
-	post.Body = template.HTML(markdown.Render(doc, renderer))
-	return
-}
-func getMetaData(md []byte, post *Post) {
-	meta := &MetaData{}
-	rest, err := frontmatter.Parse(strings.NewReader(string(md)), meta)
-	if err != nil {
-		log.Fatal("Error getting meta data")
-	}
-	post.Meta = *meta
-	post.Body = template.HTML(rest)
+
+	html := markdown.ToHTML(body, p, renderer)
+	post.Body = template.HTML(html)
 }
 func loadPost(slug string) (*Post, error) {
 	filename := blogPath + slug + ".md"
@@ -56,8 +47,14 @@ func loadPost(slug string) (*Post, error) {
 	if err != nil {
 		return nil, err
 	}
-	//	return &Post{Slug: "title", Body: template.HTML(body)}, nil
-	return mdToHtml(body), nil
+	meta := &MetaData{}
+	rest, err := frontmatter.Parse(bytes.NewReader(body), meta)
+	if err != nil {
+		return nil, err
+	}
+	post := &Post{Slug: "title", Title: meta.Title}
+	mdToHtml(post, rest)
+	return post, nil
 }
 
 func loadPosts(dir string) (*Posts, error) {
@@ -110,8 +107,9 @@ func faviconHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "public/images/favicon.ico")
 }
 func throwInternalServerError(w http.ResponseWriter, err error) {
-	http.Error(w, err.Error(), http.StatusInternalServerError)
+	log.Fatal(err.Error(), "internal server error")
 }
+
 func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", homeHandler)
