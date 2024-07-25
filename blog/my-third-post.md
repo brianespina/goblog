@@ -1,3 +1,6 @@
+---
+title: this is third page title
+---
 # This is my third post 
 Package gorilla/mux implements a request router and dispatcher for matching incoming requests to their respective handler.
 

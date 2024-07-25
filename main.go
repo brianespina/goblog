@@ -71,17 +71,17 @@ func loadPosts(dir string) (*Posts, error) {
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	posts, err := loadPosts("blog")
 	if err != nil {
-		throwInternalServerError(w, err)
+		throwInternalServerError(err)
 		return
 	}
 	t, err := template.ParseFiles(templatePath+"layout.html", templatePath+"home.html")
 	if err != nil {
-		throwInternalServerError(w, err)
+		throwInternalServerError(err)
 		return
 	}
 	err = t.Execute(w, posts)
 	if err != nil {
-		throwInternalServerError(w, err)
+		throwInternalServerError(err)
 		return
 	}
 }
@@ -99,14 +99,14 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	err = t.Execute(w, post)
 	if err != nil {
-		throwInternalServerError(w, err)
+		throwInternalServerError(err)
 		return
 	}
 }
 func faviconHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "public/images/favicon.ico")
 }
-func throwInternalServerError(w http.ResponseWriter, err error) {
+func throwInternalServerError(err error) {
 	log.Fatal(err.Error(), "internal server error")
 }
 
