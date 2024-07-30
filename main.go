@@ -1,61 +1,20 @@
 package main
 
 import (
-	"bytes"
+	"espinabrian/mdblog/models"
+	"github.com/gorilla/mux"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
 	"strings"
-
-	"github.com/adrg/frontmatter"
-	"github.com/gomarkdown/markdown"
-	"github.com/gomarkdown/markdown/html"
-	"github.com/gomarkdown/markdown/parser"
-	"github.com/gorilla/mux"
 )
 
-type Post struct {
-	Slug  string
-	Title string
-	Body  template.HTML
-}
 type Posts struct {
 	Slugs []string
 }
-type MetaData struct {
-	Title string `yaml:"title"`
-}
 
 var templatePath = "templates/"
-var blogPath = "blog/"
-
-func mdToHtml(post *Post, body []byte) {
-	extensions := parser.CommonExtensions | parser.AutoHeadingIDs
-	p := parser.NewWithExtensions(extensions)
-
-	htmlFlags := html.CommonFlags | html.HrefTargetBlank
-	opts := html.RendererOptions{Flags: htmlFlags}
-	renderer := html.NewRenderer(opts)
-
-	html := markdown.ToHTML(body, p, renderer)
-	post.Body = template.HTML(html)
-}
-func loadPost(slug string) (*Post, error) {
-	filename := blogPath + slug + ".md"
-	body, err := os.ReadFile(filename)
-	if err != nil {
-		return nil, err
-	}
-	meta := &MetaData{}
-	rest, err := frontmatter.Parse(bytes.NewReader(body), meta)
-	if err != nil {
-		return nil, err
-	}
-	post := &Post{Slug: "title", Title: meta.Title}
-	mdToHtml(post, rest)
-	return post, nil
-}
 
 func loadPosts(dir string) (*Posts, error) {
 	posts, _ := os.ReadDir(dir)
@@ -87,16 +46,20 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 }
 func viewHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	post, err := loadPost(vars["slug"])
+	post := models.Post{}
+	err := post.Load(vars["slug"])
 	if err != nil {
 		http.NotFound(w, r)
 		return
 	}
+
 	t, err := template.ParseFiles(templatePath+"layout.html", templatePath+"page.html")
+
 	if err != nil {
 		log.Fatal("error in parsing files")
 		return
 	}
+
 	err = t.Execute(w, post)
 	if err != nil {
 		throwInternalServerError(err)
