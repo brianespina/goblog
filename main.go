@@ -1,6 +1,7 @@
 package main
 
 import (
+	"espinabrian/mdblog/db"
 	"espinabrian/mdblog/models"
 	"github.com/gorilla/mux"
 	"html/template"
@@ -74,6 +75,10 @@ func throwInternalServerError(err error) {
 }
 
 func main() {
+	db := db.Store{}
+	conn := db.Connect()
+	defer db.Close()
+	log.Println("db: ", conn)
 	r := mux.NewRouter()
 	r.HandleFunc("/", homeHandler)
 	r.HandleFunc("/favicon.ico", faviconHandler)
