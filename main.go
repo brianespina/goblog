@@ -22,9 +22,10 @@ func loadPosts(dir string) (*Posts, error) {
 	for _, file := range fnames {
 		name := file.Name()
 		slug, _, _ := strings.Cut(name, ".")
-		p := models.Post{}
+		p := models.NewPost()
 		p.Load(slug)
-		posts = append(posts, p)
+
+		posts = append(posts, *p)
 	}
 	return &posts, nil
 }
@@ -78,6 +79,8 @@ func throwInternalServerError(err error) {
 
 func main() {
 	r := mux.NewRouter()
+	fs := http.FileServer(http.Dir("./public/images/"))
+	r.PathPrefix("/images/").Handler(http.StripPrefix("/images/", fs))
 	r.HandleFunc("/", homeHandler)
 	r.HandleFunc("/favicon.ico", faviconHandler)
 	r.HandleFunc("/{slug}", viewHandler)

@@ -16,10 +16,16 @@ type Post struct {
 	Body   template.HTML
 	Exerpt string
 	Slug   string
+	Image  bool
 }
 
 var blogPath = "blog/"
 
+func NewPost() *Post {
+	return &Post{
+		Image: false,
+	}
+}
 func (p *Post) Load(slug string) error {
 	filename := blogPath + slug + ".md"
 	body, err := os.ReadFile(filename)
