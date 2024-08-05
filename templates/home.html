@@ -1,8 +1,8 @@
 {{define "head"}}<title>Blog Roll</title>{{end}}
 {{ define "body" }}
-<div>
+<div style="display: flex; max-width: 1200px; width: 100%; margin: auto;">
 	{{ range . }}
-		<div>
+		<div style="flex-basis: 33.33%; gap: 20px;box-sizing: border-box; padding: 20px;">
 		<h2><a href="{{.Slug}}">{{.Title}}</a></h2>
 		<p>{{.Exerpt}}</p>
 		</div>
