@@ -24,7 +24,10 @@ func loadPosts(dir string) (*Posts, error) {
 		slug, _, _ := strings.Cut(name, ".")
 		p := models.NewPost()
 		p.Load(slug)
-
+		_, err := os.ReadFile("public/images/" + slug + ".jpg")
+		if err == nil {
+			p.Image = true
+		}
 		posts = append(posts, *p)
 	}
 	return &posts, nil
