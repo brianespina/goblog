@@ -15,6 +15,7 @@ type Post struct {
 	Title  string
 	Body   template.HTML
 	Exerpt string
+	Slug   string
 }
 
 var blogPath = "blog/"
@@ -38,6 +39,7 @@ func (p *Post) Load(slug string) error {
 	}
 	p.Title = meta.Title
 	p.Exerpt = meta.Exerpt
+	p.Slug = slug
 	p.mdToHtml(rest)
 	return nil
 }

@@ -1,6 +1,7 @@
 ---
 title: This is a title of my First Post
 exerpt: this is a short exerpt of the post.this is a short exerpt of the post.
+image: blog-image.jpg
 ---
 
 

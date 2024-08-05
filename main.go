@@ -1,31 +1,32 @@
 package main
 
 import (
-	"espinabrian/mdblog/db"
 	"espinabrian/mdblog/models"
-	"github.com/gorilla/mux"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/gorilla/mux"
 )
 
-type Posts struct {
-	Slugs []string
-}
+type Posts []models.Post
 
 var templatePath = "templates/"
 
 func loadPosts(dir string) (*Posts, error) {
-	posts, _ := os.ReadDir(dir)
-	var names []string
-	for _, post := range posts {
-		name := post.Name()
+	fnames, _ := os.ReadDir(dir)
+	var posts Posts
+
+	for _, file := range fnames {
+		name := file.Name()
 		slug, _, _ := strings.Cut(name, ".")
-		names = append(names, slug)
+		p := models.Post{}
+		p.Load(slug)
+		posts = append(posts, p)
 	}
-	return &Posts{Slugs: names}, nil
+	return &posts, nil
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
@@ -39,6 +40,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 		throwInternalServerError(err)
 		return
 	}
+
 	err = t.Execute(w, posts)
 	if err != nil {
 		throwInternalServerError(err)
@@ -75,10 +77,6 @@ func throwInternalServerError(err error) {
 }
 
 func main() {
-	db := db.Store{}
-	conn := db.Connect()
-	defer db.Close()
-	log.Println("db: ", conn)
 	r := mux.NewRouter()
 	r.HandleFunc("/", homeHandler)
 	r.HandleFunc("/favicon.ico", faviconHandler)
