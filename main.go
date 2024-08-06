@@ -1,14 +1,15 @@
+//go:generate npm run build
 package main
 
 import (
+	"embed"
 	"espinabrian/mdblog/models"
+	"github.com/gorilla/mux"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
 	"strings"
-
-	"github.com/gorilla/mux"
 )
 
 type Posts []models.Post
@@ -80,10 +81,12 @@ func throwInternalServerError(err error) {
 	log.Fatal(err.Error(), "internal server error")
 }
 
+var static embed.FS
+
 func main() {
 	r := mux.NewRouter()
-	fs := http.FileServer(http.Dir("./public/images/"))
-	r.PathPrefix("/images/").Handler(http.StripPrefix("/images/", fs))
+	r.PathPrefix("/public/").Handler(http.StripPrefix("/public/", http.FileServer(http.Dir("public"))))
+
 	r.HandleFunc("/", homeHandler)
 	r.HandleFunc("/favicon.ico", faviconHandler)
 	r.HandleFunc("/{slug}", viewHandler)

@@ -1,12 +1,12 @@
 {{define "head"}}<title>Blog Roll</title>{{end}}
 {{ define "body" }}
-<div style="display: flex; max-width: 1200px; width: 100%; margin: auto;">
+<div style="display: flex;">
 	{{ range . }}
 		<div style="flex-basis: 33.33%; gap: 20px;box-sizing: border-box; padding: 20px;">
 		{{if .Image}}
-			<img src="/images/{{.Slug}}.jpg" width="100%">
-		{{else}}
-			no image
+			<a href="{{.Slug}}">
+			<img src="/public/images/{{.Slug}}.jpg" width="100%">
+			</a>
 		{{end}}
 		<h2><a href="{{.Slug}}">{{.Title}}</a></h2>
 		<p>{{.Exerpt}}</p>
