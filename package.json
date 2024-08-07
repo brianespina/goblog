@@ -7,8 +7,8 @@
     "test": "test"
   },
   "scripts": {
-    "build": "tailwindcss build -o public/css/tailwind.css",
-    "watch": "tailwindcss build -o public/css/tailwind.css --watch"
+    "build": "tailwindcss build -i public/css/tailwind.css -o public/css/style.css",
+    "watch": "npx tailwindcss -i public/css/tailwind.css -o public/css/style.css --watch"
   },
   "author": "",
   "license": "ISC",

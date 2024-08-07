@@ -1,16 +1,16 @@
 {{define "head"}}<title>Blog Roll</title>{{end}}
 {{ define "body" }}
-<div style="display: flex;">
+<div class="flex gap-6">
 	{{ range . }}
-		<div style="flex-basis: 33.33%; gap: 20px;box-sizing: border-box; padding: 20px;">
+	<div class="">
 		{{if .Image}}
-			<a href="{{.Slug}}">
+		<a href="{{.Slug}}">
 			<img src="/public/images/{{.Slug}}.jpg" width="100%">
-			</a>
+		</a>
 		{{end}}
-		<h2><a href="{{.Slug}}">{{.Title}}</a></h2>
+		<h2 class="py-2"><a href="{{.Slug}}">{{.Title}}</a></h2>
 		<p>{{.Exerpt}}</p>
-		</div>
+	</div>
 	{{ end}}
 </div>
 {{end}}
