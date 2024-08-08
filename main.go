@@ -86,6 +86,11 @@ var static embed.FS
 func main() {
 	r := mux.NewRouter()
 	r.PathPrefix("/public/").Handler(http.StripPrefix("/public/", http.FileServer(http.Dir("public"))))
+	// Define the directory to serve static files from
+	fs := http.FileServer(http.Dir("public"))
+
+	// Handle static files
+	http.Handle("/public/", http.StripPrefix("/public/", fs))
 
 	r.HandleFunc("/", homeHandler)
 	r.HandleFunc("/favicon.ico", faviconHandler)
