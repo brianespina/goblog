@@ -1,15 +1,20 @@
 {{define "head"}}<title>Blog Roll</title>{{end}}
 {{ define "body" }}
-<div class="flex gap-6">
+<div class="">
 	{{ range . }}
-	<div class="">
-		{{if .Image}}
-		<a href="{{.Slug}}">
-			<img src="/public/images/{{.Slug}}.jpg" width="100%">
-		</a>
-		{{end}}
-		<h2 class="py-2"><a href="{{.Slug}}">{{.Title}}</a></h2>
-		<p>{{.Exerpt}}</p>
+	<div class="flex gap-6 mb-6">
+		<div class="w-64 h-36 overflow-hidden flex-none">
+			{{if .Image}}
+			<a href="{{.Slug}}">
+				<img class="rounded-md w-full h-full object-cover" src="/public/images/{{.Slug}}.jpg"
+					width="100%">
+			</a>
+			{{end}}
+		</div>
+		<div class="flex flex-col justify-center">
+			<h2 class="py-2"><a href="{{.Slug}}">{{.Title}}</a></h2>
+			<p>{{.Exerpt}}</p>
+		</div>
 	</div>
 	{{ end}}
 </div>
