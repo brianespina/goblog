@@ -1,6 +1,7 @@
 {{define "head"}}<title>{{ .Title }}</title>{{end}}
 {{define "body"}}
 <main>
+	Date: {{.Date}} <br>
 	Featured Image:
 	{{if .Image}}
 	<img class="rounded-md w-full h-full object-cover" src="/public/images/{{.Slug}}.jpg" width="100%">
