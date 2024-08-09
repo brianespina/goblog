@@ -14,7 +14,7 @@ import (
 
 type Posts []models.Post
 
-var templatePath = "templates/"
+const TEMPLATEPATH = "templates/"
 
 func loadPosts(dir string) (*Posts, error) {
 	fnames, _ := os.ReadDir(dir)
@@ -36,7 +36,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 		throwInternalServerError(err)
 		return
 	}
-	t, err := template.ParseFiles(templatePath+"layout.html", templatePath+"home.html")
+	t, err := template.ParseFiles(TEMPLATEPATH+"layout.html", TEMPLATEPATH+"home.html")
 	if err != nil {
 		throwInternalServerError(err)
 		return
@@ -55,7 +55,7 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	t, err := template.ParseFiles(templatePath+"layout.html", templatePath+"page.html")
+	t, err := template.ParseFiles(TEMPLATEPATH+"layout.html", TEMPLATEPATH+"page.html")
 
 	if err != nil {
 		log.Fatal("error in parsing files")
@@ -80,11 +80,6 @@ var static embed.FS
 func main() {
 	r := mux.NewRouter()
 	r.PathPrefix("/public/").Handler(http.StripPrefix("/public/", http.FileServer(http.Dir("public"))))
-	// Define the directory to serve static files from
-	fs := http.FileServer(http.Dir("public"))
-
-	// Handle static files
-	http.Handle("/public/", http.StripPrefix("/public/", fs))
 
 	r.HandleFunc("/", homeHandler)
 	r.HandleFunc("/favicon.ico", faviconHandler)

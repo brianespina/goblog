@@ -21,15 +21,16 @@ type Post struct {
 	Date   string
 }
 
-var blogPath = "blog/"
+const BLOGPATH = "blog/"
 
 func NewPost() *Post {
 	return &Post{
 		Image: false,
 	}
 }
+
 func (p *Post) Load(slug string) error {
-	filename := blogPath + slug + ".md"
+	filename := BLOGPATH + slug + ".md"
 	body, err := os.ReadFile(filename)
 	if err != nil {
 		return err
@@ -63,6 +64,7 @@ func (p *Post) addDate(filename string) {
 	}
 	p.Date = info.ModTime().Format("Jan 02, 2006")
 }
+
 func (p *Post) mdToHtml(body []byte) {
 	extensions := parser.CommonExtensions | parser.AutoHeadingIDs
 	newParse := parser.NewWithExtensions(extensions)
