@@ -25,10 +25,6 @@ func loadPosts(dir string) (*Posts, error) {
 		slug, _, _ := strings.Cut(name, ".")
 		p := models.NewPost()
 		p.Load(slug)
-		_, err := os.ReadFile("public/images/" + slug + ".jpg")
-		if err == nil {
-			p.Image = true
-		}
 		posts = append(posts, *p)
 	}
 	return &posts, nil
@@ -55,12 +51,10 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 func viewHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	post := models.Post{}
-	err := post.Load(vars["slug"])
-	if err != nil {
+	if err := post.Load(vars["slug"]); err != nil {
 		http.NotFound(w, r)
 		return
 	}
-
 	t, err := template.ParseFiles(templatePath+"layout.html", templatePath+"page.html")
 
 	if err != nil {

@@ -50,6 +50,9 @@ func (p *Post) Load(slug string) error {
 	p.Slug = slug
 	p.addDate(filename)
 	p.mdToHtml(rest)
+	if _, err := os.ReadFile("public/images/" + slug + ".jpg"); err == nil {
+		p.Image = true
+	}
 	return nil
 }
 
