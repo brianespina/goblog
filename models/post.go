@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/adrg/frontmatter"
 	"github.com/gomarkdown/markdown"
@@ -13,12 +14,13 @@ import (
 )
 
 type Post struct {
-	Title  string
-	Body   template.HTML
-	Exerpt string
-	Slug   string
-	Image  bool
-	Date   string
+	Title      string
+	Body       template.HTML
+	Exerpt     string
+	Slug       string
+	Image      bool
+	Date       string
+	Categories []string
 }
 
 const BLOGPATH = "blog/"
@@ -36,11 +38,13 @@ func (p *Post) Load(slug string) error {
 		return err
 	}
 	meta := &struct {
-		Title  string `yaml:"title"`
-		Exerpt string `yaml:"exerpt"`
+		Title      string `yaml:"title"`
+		Exerpt     string `yaml:"exerpt"`
+		Categories string `yaml:"categories"`
 	}{
-		Title:  "",
-		Exerpt: "",
+		Title:      "",
+		Exerpt:     "",
+		Categories: "",
 	}
 	rest, err := frontmatter.Parse(bytes.NewReader(body), meta)
 	if err != nil {
@@ -48,6 +52,7 @@ func (p *Post) Load(slug string) error {
 	}
 	p.Title = meta.Title
 	p.Exerpt = meta.Exerpt
+	p.Categories = strings.Split(meta.Categories, ",")
 	p.Slug = slug
 	p.addDate(filename)
 	p.mdToHtml(rest)
